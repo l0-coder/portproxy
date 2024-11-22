@@ -1,64 +1,36 @@
-name: C Build and Release
+name: Build
 
 on:
   push:
     branches: [ "main" ]
-    tags:
-      - 'v*'  # 推送标签时触发
+    tags: [ 'v*' ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-        include:
-          - os: windows-latest
-            output: portproxy.exe
-            artifact: portproxy-windows
-          - os: ubuntu-latest
-            output: portproxy
-            artifact: portproxy-linux
-
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Build Windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        cl.exe /nologo /O2 /W4 portproxy.c /Fe:${{ matrix.output }}
-      
-    - name: Build Linux
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        gcc -O2 -Wall -o ${{ matrix.output }} portproxy.c
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-    - name: Upload artifacts
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.artifact }}
-        path: ${{ matrix.output }}
-
-  release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v3
+        name: portproxy
+        path: build/bin/Release/portproxy.exe
 
     - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          portproxy-windows/portproxy.exe
-          portproxy-linux/portproxy
-        draft: false
-        prerelease: false
+        files: build/bin/Release/portproxy.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,18 @@
+#include <windows.h>
+#include "version.h"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "FileDescription",  APP_DESCRIPTION
+            VALUE "FileVersion",      APP_VERSION
+            VALUE "ProductName",      APP_NAME
+            VALUE "LegalCopyright",   APP_COPYRIGHT
+        END
+    END
+END

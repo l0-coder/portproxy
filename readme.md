@@ -107,9 +107,11 @@ portproxy plc=siemens listen=192.168.1.1 target=192.168.2.11
 
 ## 系统要求
 
-- Windows 操作系统
+- Windows 操作系统（Windows 7 或更高版本）
 - 管理员权限（执行 netsh 命令需要）
-- CMake 3.10 或更高版本（仅构建时需要）
+- 用于构建（可选）：
+  - Visual Studio 2019 或更高版本
+  - CMake 3.10 或更高版本
 
 ## 常见问题
 
