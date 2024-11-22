@@ -1,0 +1,64 @@
+name: C Build and Release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v*'  # 推送标签时触发
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            output: portproxy.exe
+            artifact: portproxy-windows
+          - os: ubuntu-latest
+            output: portproxy
+            artifact: portproxy-linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        cl.exe /nologo /O2 /W4 portproxy.c /Fe:${{ matrix.output }}
+      
+    - name: Build Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        gcc -O2 -Wall -o ${{ matrix.output }} portproxy.c
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.artifact }}
+        path: ${{ matrix.output }}
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          portproxy-windows/portproxy.exe
+          portproxy-linux/portproxy
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
