@@ -8,6 +8,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # 添加源文件
 add_executable(portproxy 
     src/main.c
+    src/portproxy.c
 )
 
 # 包含头文件目录
