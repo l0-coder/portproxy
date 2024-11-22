@@ -1,72 +1,7 @@
+#include <stdio.h>
+#include <string.h>
 #include "portproxy.h"
 #include "version.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-// Jetter PLC 端口配置
-static const PortMapping JETTER_PORTS[] = {
-    {80}, {502}, {50000}, {50001}, {52000}
-};
-
-// Siemens PLC 端口配置
-static const PortMapping SIEMENS_PORTS[] = {
-    {80}, {102}
-};
-
-// 执行系统命令
-static void execute_command(const char* cmd) {
-    printf("Executing: %s\n", cmd);
-    system(cmd);
-}
-
-void show_mappings(void) {
-    execute_command("netsh interface portproxy show all");
-}
-
-void print_version(void) {
-    printf("%s version %s\n", APP_NAME, APP_VERSION);
-    printf("%s\n", APP_COPYRIGHT);
-    printf("%s\n", APP_DESCRIPTION);
-}
-
-void print_usage(const char* program_name) {
-    printf("Usage: %s [plc=jetter|siemens] [listen=IP] [target=IP]\n\n", program_name);
-    printf("Options:\n");
-    printf("  -h, --help     : Show this help message\n");
-    printf("  -v, --version  : Show version information\n");
-    printf("  No arguments   : Show current port mappings\n");
-    printf("  plc=TYPE       : PLC type (jetter or siemens)\n");
-    printf("  listen=IP      : Local IP address to listen on\n");
-    printf("  target=IP      : Target IP address to forward to\n");
-}
-
-// 删除所有现有端口映射
-void delete_all_mappings(const char* listen_ip) {
-    char cmd[256];
-    // 显示所有当前映射以供参考
-    execute_command("netsh interface portproxy show all");
-    
-    // 为每个可能的端口执行删除操作
-    int all_ports[] = {80, 102, 502, 50000, 50001, 52000};
-    int port_count = sizeof(all_ports) / sizeof(all_ports[0]);
-    
-    for (int i = 0; i < port_count; i++) {
-        snprintf(cmd, sizeof(cmd), 
-                "netsh interface portproxy delete v4tov4 listenport=%d listenaddress=%s",
-                all_ports[i], listen_ip);
-        execute_command(cmd);
-    }
-}
-
-// 添加端口映射
-void add_port_mapping(int port, const char* listen_ip, const char* target_ip) {
-    char cmd[256];
-    snprintf(cmd, sizeof(cmd), 
-            "netsh interface portproxy add v4tov4 listenport=%d listenaddress=%s connectaddress=%s connectport=%d",
-            port, listen_ip, target_ip, port);
-    execute_command(cmd);
-}
 
 int main(int argc, char* argv[]) {
     // 检查是否启用调试模式
@@ -101,7 +36,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    // 检查参数数量 (不包括 --debug)
+    // 检查参数数量
     if (argc > 4) {
         printf("Error: Too many arguments\n");
         print_usage(argv[0]);

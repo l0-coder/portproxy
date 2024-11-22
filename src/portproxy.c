@@ -64,4 +64,7 @@ void print_usage(const char* program_name) {
     printf("  plc=TYPE      : PLC type (jetter or siemens)\n");
     printf("  listen=IP     : Local IP address to listen on\n");
     printf("  target=IP     : Target IP address to forward to\n");
+    printf("  --debug       : Show debug information\n");
+    printf("  -h, --help    : Show this help message\n");
+    printf("  -v, --version : Show version information\n");
 }
