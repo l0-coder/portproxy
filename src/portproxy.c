@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// 初始化调试模式标志
+int debug_mode = 0;
+
 // 端口配置定义
 const PortMapping jetter_ports[] = {
     {80}, {502}, {50000}, {50001}, {52000}
@@ -17,7 +20,9 @@ const size_t siemens_ports_count = sizeof(siemens_ports) / sizeof(siemens_ports[
 
 // 执行系统命令
 static void execute_command(const char* cmd) {
-    printf("Executing: %s\n", cmd);
+    if (debug_mode) {
+        printf("Executing: %s\n", cmd);
+    }
     system(cmd);
 }
 

@@ -12,6 +12,9 @@ typedef struct {
     int port;
 } PortMapping;
 
+// 调试模式标志
+extern int debug_mode;
+
 // 函数声明
 void show_mappings(void);
 void add_port_mapping(int port, const char* listen_ip, const char* target_ip);
