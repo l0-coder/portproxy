@@ -19,12 +19,16 @@ target_include_directories(portproxy PRIVATE
 # 添加 Windows 资源文件
 target_sources(portproxy PRIVATE src/resource.rc)
 
-# 设置输出目录
-set_target_properties(portproxy PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
-)
+# Windows 特定配置
+if(MSVC)
+    # 设置 MSVC 输出目录
+    foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER ${CONFIG} CONFIG_UPPER)
+        set_target_properties(portproxy PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_BINARY_DIR}/${CONFIG}"
+        )
+    endforeach()
+endif()
 
 # 安装配置
 install(TARGETS portproxy

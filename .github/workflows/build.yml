@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4      # 更新到 v4
 
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release
@@ -21,16 +21,22 @@ jobs:
     - name: Build
       run: cmake --build build --config Release
 
+    - name: List Build Directory     # 添加调试步骤
+      shell: pwsh
+      run: |
+        Get-ChildItem -Recurse build
+
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4    # 更新到 v4
       with:
         name: portproxy
-        path: build/bin/Release/portproxy.exe
+        path: build/Release/portproxy.exe  # 修正路径
+        if-no-files-found: error          # 如果文件不存在则报错
 
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v1
       with:
-        files: build/bin/Release/portproxy.exe
+        files: build/Release/portproxy.exe  # 同样修正路径
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
